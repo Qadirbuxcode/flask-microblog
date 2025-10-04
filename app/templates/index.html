@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    {% if current_user.is_authenticated %}
+      <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <div class="form-group mb-3">
+          {{ form.post.label(class="form-label") }}
+          {{ form.post(class="form-control") }}
+          {% for error in form.post.errors %}
+            <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<hr>
+
+{% for post in posts %}
+  {% include '_post.html' %}
+{% endfor %}
+
+<nav aria-label="Post navigation">
+  <ul class="pagination justify-content-center">
+    {% set page = request.args.get('page', 1) | int %}
+
+    {# Newer posts #}
+    {% if prev_url is defined and prev_url %}
+      <li class="page-item"><a class="page-link" href="{{ prev_url }}">Newer posts</a></li>
+    {% elif page > 1 %}
+      <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, page=page-1) }}">Newer posts</a></li>
+    {% endif %}
+
+    {# Older posts #}
+    {% if next_url is defined and next_url %}
+      <li class="page-item"><a class="page-link" href="{{ next_url }}">Older posts</a></li>
+    {% else %}
+      <li class="page-item"><a class="page-link" href="{{ url_for(request.endpoint, page=page+1) }}">Older posts</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+{# Password reset link helper #}
+<script>
+document.addEventListener('click', function(e){
+  var a = e.target.closest && e.target.closest('a');
+  if (!a) return;
+  var href = a.getAttribute('href') || '';
+  var low = href.toLowerCase();
+  if (low.indexOf('reset') !== -1 || low.indexOf('forgot') !== -1 || low.indexOf('password') !== -1) {
+    e.preventDefault();
+    var candidates = [href,
+      '/reset_password', '/auth/reset_password',
+      '/reset_password_request', '/auth/reset_password_request',
+      '/password_reset', '/auth/password_reset'];
+    (async function() {
+      for (var i = 0; i < candidates.length; i++) {
+        var url = candidates[i];
+        if (!url) continue;
+        try {
+          var resp = await fetch(url, { method: 'HEAD', credentials: 'same-origin' });
+          if (resp && resp.ok) { window.location.href = url; return; }
+        } catch (err) {}
+      }
+      window.location.href = href;
+    })();
+  }
+});
+</script>
+{% endblock %}

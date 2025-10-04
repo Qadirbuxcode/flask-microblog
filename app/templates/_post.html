@@ -1,0 +1,21 @@
+<div class="media mb-4">
+  <!-- Profile Image -->
+  <img src="{{ post.author.avatar(64) }}" 
+       alt="profile picture"
+       class="rounded-circle me-3"
+       width="50">
+
+  <div class="media-body">
+    <!-- Username links to profile -->
+    <h5 class="mt-0">
+      <a href="{{ url_for('main.user', username=post.author.username) }}">
+        {{ post.author.username }}
+      </a>
+    </h5>
+
+    <!-- Post Content -->
+    <p>{{ post.body }}</p>
+    <small class="text-muted">{{ moment(post.timestamp).fromNow() }}</small>
+  </div>
+</div>
+<hr>
